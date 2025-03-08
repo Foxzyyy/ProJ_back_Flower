@@ -24,45 +24,38 @@ app.get("/api/orders", (req, res) => {
 // 📌 เพิ่มคำสั่งซื้อใหม่
 app.post("/api/orders", (req, res) => {
     const newOrder = req.body;
+    // คำนวณ total จาก cost และ quantity
+    newOrder.total = newOrder.cost * newOrder.quantity;
+    // เพิ่มคำสั่งซื้อใหม่เข้าไปใน orders
     orders.push(newOrder);
+    console.log("📌 คำสั่งซื้อที่เพิ่ม:", newOrder); // ✅ ตรวจสอบข้อมูลที่รับเข้ามา
     res.json({ message: "Order added successfully!", order: newOrder });
-});
-
-// 📌 ลบคำสั่งซื้อ
-app.delete("/api/orders/:id", (req, res) => {
-    const { id } = req.params;
-    orders = orders.filter(order => order.id !== id);
-    res.json({ message: "Order deleted successfully!" });
 });
 
 // 📌 แก้ไขคำสั่งซื้อ
 app.put("/api/orders/:id", (req, res) => {
     const { id } = req.params;
-    const updatedOrder = req.body;
+    let updatedOrder = req.body;
+    updatedOrder.total = updatedOrder.cost * updatedOrder.quantity;  // คำนวณ total ใหม่
+    console.log(`📌 กำลังอัปเดตคำสั่งซื้อ ID: ${id}`, updatedOrder); // ✅ ดูข้อมูลที่ถูกแก้ไข
     orders = orders.map(order => (order.id === id ? updatedOrder : order));
     res.json({ message: "Order updated successfully!", order: updatedOrder });
 });
 
-app.post("/api/orders", (req, res) => {
-  const newOrder = req.body;
-  console.log("📌 คำสั่งซื้อที่เพิ่ม:", newOrder); // ✅ ตรวจสอบข้อมูลที่รับเข้ามา
-  orders.push(newOrder);
-  res.json({ message: "Order added successfully!", order: newOrder });
-});
-
-app.put("/api/orders/:id", (req, res) => {
-  const { id } = req.params;
-  const updatedOrder = req.body;
-  console.log(`📌 กำลังอัปเดตคำสั่งซื้อ ID: ${id}`, updatedOrder); // ✅ ดูข้อมูลที่ถูกแก้ไข
-  orders = orders.map(order => (order.id === id ? updatedOrder : order));
-  res.json({ message: "Order updated successfully!", order: updatedOrder });
-});
-
+// 📌 ลบคำสั่งซื้อ
 app.delete("/api/orders/:id", (req, res) => {
-  const { id } = req.params;
-  console.log(`🗑️ กำลังลบคำสั่งซื้อ ID: ${id}`); // ✅ ดูว่า ID ไหนถูกลบ
-  orders = orders.filter(order => order.id !== id);
-  res.json({ message: "Order deleted successfully!" });
+    const { id } = req.params;
+    console.log(`🗑️ กำลังลบคำสั่งซื้อ ID: ${id}`); // ✅ ดูว่า ID ไหนถูกลบ
+    orders = orders.filter(order => order.id !== id);
+    res.json({ message: "Order deleted successfully!" });
 });
 
-
+// 📌 ดึงข้อมูลคำสั่งซื้อโดย ID
+app.get("/api/orders/:id", (req, res) => {
+    const { id } = req.params;
+    const order = orders.find(order => order.id === id);
+    if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+    }
+    res.json(order);
+});
