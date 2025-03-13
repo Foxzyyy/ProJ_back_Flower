@@ -219,7 +219,7 @@ app.post("/orders", (req, res) => {
   const numbuyInt = parseInt(numbuy);
   const costInt = parseInt(cost);
   const total = numbuyInt * costInt;
-  const status = "incomplete"; // ✅ กำหนดค่าให้ status
+  const status = "complete"; // ✅ กำหนดค่าให้ status
 
   if (isNaN(numbuyInt) || isNaN(costInt) || numbuyInt <= 0 || costInt <= 0) {
       return res.status(400).json({ error: "ข้อมูลไม่ถูกต้อง" });
